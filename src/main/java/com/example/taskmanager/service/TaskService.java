@@ -13,10 +13,17 @@ import com.example.taskmanager.entity.Task;
 import com.example.taskmanager.exception.TaskNotFoundException;
 import com.example.taskmanager.mapper.TaskMapper;
 import com.example.taskmanager.repository.TaskRepository;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
 public class TaskService {
 
+	
+
+	    private static final Logger log =
+	            LoggerFactory.getLogger(TaskService.class);
+
+	
 	private final TaskRepository repository;
 	private final TaskMapper mapper;
 	
@@ -49,6 +56,7 @@ public class TaskService {
     }
 
     public void deleteTask(Long id) {
+    	log.info("Deleting task with id: {}", id);
 
         Task existingTask = repository.findById(id)
                 .orElseThrow(() ->
@@ -59,7 +67,7 @@ public class TaskService {
     }
 
     public Task getTaskById(Long id) {
-
+    	log.info("Fetching task with id: {}", id);
         return repository.findById(id)
                 .orElseThrow(() ->
                         new TaskNotFoundException(
@@ -81,6 +89,7 @@ public class TaskService {
         return repository.findByStatus(status);
     }
     public TaskResponse createTask(TaskRequest request) {
+    	log.info("Creating task with title: {}", request.getTitle());
         Task task = mapper.toEntity(request);
         Task savedTask = repository.save(task);
         return mapper.toResponse(savedTask);
