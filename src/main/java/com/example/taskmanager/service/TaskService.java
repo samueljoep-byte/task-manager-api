@@ -2,10 +2,8 @@ package com.example.taskmanager.service;
 
 import java.util.List;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
+import com.example.taskmanager.entity.User;
 import com.example.taskmanager.TaskStatus;
 import com.example.taskmanager.dto.TaskRequest;
 import com.example.taskmanager.dto.TaskResponse;
@@ -13,85 +11,142 @@ import com.example.taskmanager.entity.Task;
 import com.example.taskmanager.exception.TaskNotFoundException;
 import com.example.taskmanager.mapper.TaskMapper;
 import com.example.taskmanager.repository.TaskRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.example.taskmanager.repository.UserRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 @Service
 public class TaskService {
 
-	
-
-	    private static final Logger log =
-	            LoggerFactory.getLogger(TaskService.class);
-
-	
 	private final TaskRepository repository;
 	private final TaskMapper mapper;
-	
-    public TaskService(
-            TaskRepository repository,
-            TaskMapper mapper) {
+	private final UserRepository userRepository;
 
-        this.repository = repository;
-        this.mapper = mapper;
-    }
+	public TaskService(
+	        TaskRepository repository,
+	        TaskMapper mapper,
+	        UserRepository userRepository) {
 
+	    this.repository = repository;
+	    this.mapper = mapper;
+	    this.userRepository = userRepository;
+	}
 
-    public List<Task> getAllTasks() {
+    // CREATE
+	public TaskResponse createTask(TaskRequest request) {
 
-        return repository.findAll();
-    }
+	    String username = SecurityContextHolder
+	            .getContext()
+	            .getAuthentication()
+	            .getName();
 
-    public Task updateTask(Long id, Task task) {
+	    User user = userRepository.findByUsername(username)
+	            .orElseThrow(() ->
+	                    new RuntimeException("User not found"));
 
-        Task existingTask = repository.findById(id)
-                .orElseThrow(() ->
-                        new TaskNotFoundException(
-                                "Task not found with id: " + id));
+	    Task task = mapper.toEntity(request);
 
-        existingTask.setTitle(task.getTitle());
-        existingTask.setDescription(task.getDescription());
-        existingTask.setStatus(task.getStatus());
+	    task.setUser(user);
 
-        return repository.save(existingTask);
-    }
+	    Task savedTask = repository.save(task);
 
-    public void deleteTask(Long id) {
-    	log.info("Deleting task with id: {}", id);
+	    return mapper.toResponse(savedTask);
+	}
 
-        Task existingTask = repository.findById(id)
-                .orElseThrow(() ->
-                        new TaskNotFoundException(
-                                "Task not found with id: " + id));
+    // GET ALL
+	public List<Task> getAllTasks() {
 
-        repository.delete(existingTask);
-    }
+	    String username = SecurityContextHolder
+	            .getContext()
+	            .getAuthentication()
+	            .getName();
 
-    public Task getTaskById(Long id) {
-    	log.info("Fetching task with id: {}", id);
-        return repository.findById(id)
-                .orElseThrow(() ->
-                        new TaskNotFoundException(
-                                "Task not found with id: " + id));
-    }
+	    User user = userRepository.findByUsername(username)
+	            .orElseThrow(() ->
+	                    new RuntimeException("User not found"));
 
-    public Page<Task> getTasks(Pageable pageable) {
+	    return repository.findByUser(user);
+	}
 
-        return repository.findAll(pageable);
-    }
+    // GET BY ID
+	public Task getTaskById(Long id) {
 
-    public List<Task> searchTasks(String title) {
+	    String username = SecurityContextHolder
+	            .getContext()
+	            .getAuthentication()
+	            .getName();
 
-        return repository.findByTitleContainingIgnoreCase(title);
-    }
+	    User user = userRepository.findByUsername(username)
+	            .orElseThrow(() ->
+	                    new RuntimeException("User not found"));
 
-    public List<Task> getTasksByStatus(TaskStatus status) {
+	    return repository.findByIdAndUser(id, user)
+	            .orElseThrow(() ->
+	                    new TaskNotFoundException(
+	                            "Task not found with id: " + id
+	                    ));
+	}
 
-        return repository.findByStatus(status);
-    }
-    public TaskResponse createTask(TaskRequest request) {
-    	log.info("Creating task with title: {}", request.getTitle());
-        Task task = mapper.toEntity(request);
-        Task savedTask = repository.save(task);
-        return mapper.toResponse(savedTask);
-    }
+    // GET BY STATUS
+	public List<Task> getTasksByStatus(TaskStatus status) {
+
+	    String username = SecurityContextHolder
+	            .getContext()
+	            .getAuthentication()
+	            .getName();
+
+	    User user = userRepository.findByUsername(username)
+	            .orElseThrow(() ->
+	                    new RuntimeException("User not found"));
+
+	    return repository.findByStatusAndUser(status, user);
+	}
+
+    // UPDATE
+	public TaskResponse updateTask(
+	        Long id,
+	        TaskRequest request) {
+
+	    String username = SecurityContextHolder
+	            .getContext()
+	            .getAuthentication()
+	            .getName();
+
+	    User user = userRepository.findByUsername(username)
+	            .orElseThrow(() ->
+	                    new RuntimeException("User not found"));
+
+	    Task existingTask = repository.findByIdAndUser(id, user)
+	            .orElseThrow(() ->
+	                    new TaskNotFoundException(
+	                            "Task not found with id: " + id
+	                    ));
+
+	    existingTask.setTitle(request.getTitle());
+	    existingTask.setDescription(request.getDescription());
+	    existingTask.setStatus(request.getStatus());
+
+	    Task updatedTask = repository.save(existingTask);
+
+	    return mapper.toResponse(updatedTask);
+	}
+
+    // DELETE
+	public void deleteTask(Long id) {
+
+	    String username = SecurityContextHolder
+	            .getContext()
+	            .getAuthentication()
+	            .getName();
+
+	    User user = userRepository.findByUsername(username)
+	            .orElseThrow(() ->
+	                    new RuntimeException("User not found"));
+
+	    Task task = repository.findByIdAndUser(id, user)
+	            .orElseThrow(() ->
+	                    new TaskNotFoundException(
+	                            "Task not found with id: " + id
+	                    ));
+
+	    repository.delete(task);
+	}
 }

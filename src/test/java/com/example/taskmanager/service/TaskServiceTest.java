@@ -2,15 +2,21 @@ package com.example.taskmanager.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import org.junit.jupiter.api.BeforeEach;
 
 import com.example.taskmanager.TaskStatus;
 import com.example.taskmanager.dto.TaskRequest;
@@ -19,6 +25,16 @@ import com.example.taskmanager.entity.Task;
 import com.example.taskmanager.exception.TaskNotFoundException;
 import com.example.taskmanager.mapper.TaskMapper;
 import com.example.taskmanager.repository.TaskRepository;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
+
+import com.example.taskmanager.entity.User;
+import com.example.taskmanager.repository.UserRepository;
+
+
+
 
 @ExtendWith(MockitoExtension.class)
 class TaskServiceTest {
@@ -31,8 +47,12 @@ class TaskServiceTest {
 
     @InjectMocks
     private TaskService service;
+    
+    @Mock
+    private UserRepository userRepository;
 
 
+    // CREATE TEST
     @Test
     void testCreateTask() {
 
@@ -42,11 +62,13 @@ class TaskServiceTest {
         request.setDescription("Study Spring Boot");
         request.setStatus(TaskStatus.PENDING);
 
+
         Task task = new Task();
 
         task.setTitle("Learn Spring");
         task.setDescription("Study Spring Boot");
         task.setStatus(TaskStatus.PENDING);
+
 
         TaskResponse response = new TaskResponse();
 
@@ -54,21 +76,54 @@ class TaskServiceTest {
         response.setDescription("Study Spring Boot");
         response.setStatus(TaskStatus.PENDING);
 
-        when(mapper.toEntity(request)).thenReturn(task);
 
-        when(repository.save(task)).thenReturn(task);
+        when(mapper.toEntity(request))
+                .thenReturn(task);
 
-        when(mapper.toResponse(task)).thenReturn(response);
+        when(repository.save(task))
+                .thenReturn(task);
 
-        TaskResponse result = service.createTask(request);
+        when(mapper.toResponse(task))
+                .thenReturn(response);
 
-        assertEquals("Learn Spring", result.getTitle());
+
+        TaskResponse result =
+                service.createTask(request);
+
+
+        assertEquals(
+                "Learn Spring",
+                result.getTitle()
+        );
+
+        verify(mapper).toEntity(request);
+        verify(repository).save(task);
+        verify(mapper).toResponse(task);
+        assertEquals(
+                "Learn Spring",
+                result.getTitle()
+        );
+
+        verify(mapper).toEntity(request);
+        verify(repository).save(task);
+        verify(mapper).toResponse(task);
+
+        assertEquals(
+                30L,
+                task.getUser().getId()
+        );
     }
 
+
+    // GET BY ID - NOT FOUND TEST
     @Test
     void testGetTaskByIdNotFound() {
 
-        when(repository.findById(99L))
+        User user = userRepository
+                .findByUsername("samuel2")
+                .orElseThrow();
+
+        when(repository.findByIdAndUser(99L, user))
                 .thenReturn(Optional.empty());
 
         TaskNotFoundException exception =
@@ -82,10 +137,11 @@ class TaskServiceTest {
                 exception.getMessage()
         );
 
-        verify(repository).findById(99L);
+        verify(repository).findByIdAndUser(99L, user);
     }
 
 
+    // UPDATE TEST
     @Test
     void testUpdateTask() {
 
@@ -96,20 +152,38 @@ class TaskServiceTest {
         existingTask.setDescription("Old Description");
         existingTask.setStatus(TaskStatus.PENDING);
 
-        Task updatedTask = new Task();
 
-        updatedTask.setTitle("Updated Title");
-        updatedTask.setDescription("Updated Description");
-        updatedTask.setStatus(TaskStatus.COMPLETED);
+        TaskRequest request = new TaskRequest();
 
-        when(repository.findById(1L))
+        request.setTitle("Updated Title");
+        request.setDescription("Updated Description");
+        request.setStatus(TaskStatus.COMPLETED);
+
+
+        TaskResponse response = new TaskResponse();
+
+        response.setTitle("Updated Title");
+        response.setDescription("Updated Description");
+        response.setStatus(TaskStatus.COMPLETED);
+
+
+        User user = userRepository
+                .findByUsername("samuel2")
+                .orElseThrow();
+
+        when(repository.findByIdAndUser(1L, user))
                 .thenReturn(Optional.of(existingTask));
-
+        
         when(repository.save(existingTask))
                 .thenReturn(existingTask);
 
-        Task result =
-                service.updateTask(1L, updatedTask);
+        when(mapper.toResponse(existingTask))
+                .thenReturn(response);
+
+
+        TaskResponse result =
+                service.updateTask(1L, request);
+
 
         assertEquals(
                 "Updated Title",
@@ -126,11 +200,16 @@ class TaskServiceTest {
                 result.getStatus()
         );
 
-        verify(repository).findById(1L);
+
+        verify(repository).findByIdAndUser(1L, user);
+
         verify(repository).save(existingTask);
+
+        verify(mapper).toResponse(existingTask);
     }
 
 
+    // DELETE TEST
     @Test
     void testDeleteTask() {
 
@@ -140,20 +219,32 @@ class TaskServiceTest {
         task.setTitle("Learn Spring");
         task.setDescription("Study Spring Boot");
 
-        when(repository.findById(1L))
+
+        User user = userRepository
+                .findByUsername("samuel2")
+                .orElseThrow();
+
+        when(repository.findByIdAndUser(1L, user))
                 .thenReturn(Optional.of(task));
 
         service.deleteTask(1L);
 
-        verify(repository).findById(1L);
+
+        verify(repository).findByIdAndUser(1L, user);
+
         verify(repository).delete(task);
     }
 
 
+    // DELETE - NOT FOUND TEST
     @Test
     void testDeleteTaskNotFound() {
 
-        when(repository.findById(99L))
+        User user = userRepository
+                .findByUsername("samuel2")
+                .orElseThrow();
+
+        when(repository.findByIdAndUser(99L, user))
                 .thenReturn(Optional.empty());
 
         assertThrows(
@@ -161,11 +252,31 @@ class TaskServiceTest {
                 () -> service.deleteTask(99L)
         );
 
-        verify(repository).findById(99L);
+        verify(repository).findByIdAndUser(99L, user);
+        verify(repository, never()).delete(any(Task.class));
+    }
+    
+    @BeforeEach
+    void setUpSecurityContext() {
 
-        verify(
-                repository,
-                never()
-        ).delete(any(Task.class));
+        User user = new User();
+        user.setId(30L);
+        user.setUsername("samuel2");
+        user.setRole("USER");
+
+        when(userRepository.findByUsername("samuel2"))
+                .thenReturn(Optional.of(user));
+
+        SecurityContext context =
+                SecurityContextHolder.createEmptyContext();
+
+        context.setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        "samuel2",
+                        null
+                )
+        );
+
+        SecurityContextHolder.setContext(context);
     }
 }

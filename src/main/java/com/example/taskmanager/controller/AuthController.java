@@ -34,7 +34,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(
-            @Valid @RequestBody RegisterRequest request) {
+             @RequestBody RegisterRequest request) {
 
         var user = authService.register(request);
 
@@ -48,7 +48,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(
-            @Valid @RequestBody LoginRequest request) {
+             @RequestBody LoginRequest request) {
 
         Authentication authentication =
                 authenticationManager.authenticate(

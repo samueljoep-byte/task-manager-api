@@ -21,16 +21,12 @@ public class AuthService {
 
     public User register(RegisterRequest request) {
 
-        User user = new User();
+    	User user = new User();
+    	
+    	user.setUsername(request.getUsername());
+    	user.setPassword(passwordEncoder.encode(request.getPassword()));
+    	user.setRole("USER");
 
-        user.setUsername(request.getUsername());
-
-        user.setPassword(
-                passwordEncoder.encode(request.getPassword())
-        );
-
-        user.setRole("USER");
-
-        return userRepository.save(user);
+    	return userRepository.save(user);
     }
 }
