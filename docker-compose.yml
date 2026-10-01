@@ -1,17 +1,17 @@
 services:
 
   taskmanager-app:
+
     image: taskmanager:1.0
+
     container_name: taskmanager-app
+
     ports:
-      - "8084:8083"
+      - "8083:8083"
 
     environment:
-      SPRING_DATASOURCE_URL: jdbc:oracle:thin:@//host.docker.internal:1521/FREEPDB1
-      SPRING_DATASOURCE_USERNAME: taskuser
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      APP_JWT_SECRET: ${JWT_SECRET}
-      APP_JWT_EXPIRATION_MS: 86400000
-
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_MS: 86400000

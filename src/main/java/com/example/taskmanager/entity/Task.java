@@ -11,6 +11,8 @@ import com.example.taskmanager.TaskStatus;
 import java.time.LocalDateTime;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
 @Entity
 public class Task {
@@ -31,6 +33,7 @@ public class Task {
     private String description;
     
     
+    @Enumerated(EnumType.STRING)
     private TaskStatus status;
     
     private LocalDateTime createdAt;
