@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Beginner-friendly technical notes for the Task Manager REST API built with Java, Spring Boot, Oracle, Flyway, JUnit and Mockito.">
+<title>Task Manager API | Project Notes</title>
+<style>
+:root{--bg:#f5f7fb;--panel:#fff;--ink:#172033;--muted:#5b6578;--line:#dfe5ef;--accent:#3157d5;--accent2:#eaf0ff;--code:#111827;--good:#e8f7ef;--max:1180px}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.7 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+a{color:var(--accent)}.hero{background:linear-gradient(135deg,#111b3a,#2449a4);color:white;padding:56px 22px 44px}.hero-inner,.layout{max-width:var(--max);margin:auto}.eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:.76rem;font-weight:800;color:#c6d5ff}.hero h1{font-size:clamp(2.1rem,5vw,3.8rem);line-height:1.08;margin:.45rem 0 1rem;max-width:850px}.hero p{max-width:760px;color:#e0e8ff;font-size:1.08rem}.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}.chip{border:1px solid #ffffff55;border-radius:999px;padding:5px 12px;font-size:.84rem;color:#fff}.layout{display:grid;grid-template-columns:255px minmax(0,1fr);gap:24px;padding:28px 20px 64px}.nav{align-self:start;position:sticky;top:16px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;max-height:calc(100vh - 32px);overflow:auto}.nav strong{display:block;margin-bottom:10px}.nav a{display:block;text-decoration:none;color:#35415b;padding:5px 0;font-size:.9rem}.nav a:hover{color:var(--accent);text-decoration:underline}.content{min-width:0}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:clamp(18px,3vw,30px);margin-bottom:20px;box-shadow:0 5px 18px #15254a08}.card h2{font-size:1.55rem;line-height:1.25;margin:0 0 14px}.card h3{font-size:1.1rem;margin:22px 0 8px}.muted{color:var(--muted)}.callout{background:var(--accent2);border-left:4px solid var(--accent);padding:13px 16px;border-radius:8px;margin:14px 0}.warn{background:#fff5e5;border-left-color:#c17b12}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}.mini{background:#f8faff;border:1px solid var(--line);padding:14px;border-radius:12px}.mini b{display:block}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:.94rem}th,td{padding:10px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}th{background:#f4f6fb}code{font-family:Consolas,Monaco,monospace;background:#eef1f7;padding:.12em .35em;border-radius:5px;font-size:.92em}pre{overflow:auto;background:var(--code);color:#e5e7eb;padding:16px;border-radius:10px;line-height:1.55;font-size:.88rem}pre code{background:none;padding:0;color:inherit}.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.flow span{background:#f1f4ff;border:1px solid #cdd8ff;padding:9px 12px;border-radius:9px;font-weight:650}.flow i{font-style:normal;color:var(--muted)}.qa{border-top:1px solid var(--line);padding:12px 0}.qa:first-of-type{border-top:0}.qa b{display:block;margin-bottom:4px}.checklist li{margin:7px 0}.footer{text-align:center;color:var(--muted);padding:26px 16px 40px;font-size:.9rem}.toplink{display:inline-block;margin-top:8px}.pill{display:inline-block;border-radius:999px;background:var(--good);padding:2px 9px;font-size:.8rem;font-weight:700}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.nav{position:static;max-height:none}.nav-links{columns:2}}@media(max-width:480px){.nav-links{columns:1}.hero{padding-top:38px}.card{padding:17px}th,td{padding:8px}}
+@media print{body{background:white;font-size:11pt}.hero{background:white;color:#111;padding:20px 0}.hero p,.eyebrow{color:#333}.chip{color:#111;border-color:#777}.layout{display:block;padding:0}.nav{display:none}.card{box-shadow:none;break-inside:avoid;border:1px solid #bbb}.hero h1{font-size:28pt}a{color:#111;text-decoration:none}pre{white-space:pre-wrap}}
+</style>
+</head>
+<body id="top">
+<header class="hero"><div class="hero-inner">
+<div class="eyebrow">Java backend portfolio project</div>
+<h1>Task Manager REST API</h1>
+<p>Complete project notes: what the API does, how requests travel through a Spring application, database migrations, validation, security, testing, Docker, and how to explain the project in an interview.</p>
+<div class="chips"><span class="chip">Java 21</span><span class="chip">Spring Boot</span><span class="chip">REST API</span><span class="chip">Oracle + Flyway</span><span class="chip">JUnit 5 + Mockito</span><span class="chip">Docker</span></div>
+</div></header>
+<div class="layout">
+<aside class="nav"><strong>On this page</strong><div class="nav-links">
+<a href="#overview">1. Project overview</a><a href="#stack">2. Technology stack</a><a href="#architecture">3. Architecture</a><a href="#rest">4. REST API basics</a><a href="#flow">5. Request flow</a><a href="#spring">6. Spring concepts</a><a href="#database">7. Database and JPA</a><a href="#flyway">8. Flyway migrations</a><a href="#validation">9. Validation/errors</a><a href="#security">10. Authentication/security</a><a href="#tests">11. Unit testing</a><a href="#docker">12. Docker/deployment</a><a href="#config">13. Configuration</a><a href="#interview">14. Interview Q&amp;A</a><a href="#checklist">15. Revision checklist</a>
+</div></aside>
+<main class="content">
+<section class="card" id="overview"><h2>1. Project overview</h2>
+<p>The Task Manager API is a backend application that exposes HTTP endpoints so a client—such as Postman, a browser-based frontend, or a mobile app—can create and manage tasks. The repository README lists task creation, listing, lookup by ID, updating, deleting, validation, exception handling, and unit testing.</p>
+<div class="grid"><div class="mini"><b>Purpose</b><span class="muted">Manage task records through HTTP requests.</span></div><div class="mini"><b>Persistence</b><span class="muted">Store application data in a relational database.</span></div><div class="mini"><b>Reliability</b><span class="muted">Validate input and test service behavior.</span></div><div class="mini"><b>Portfolio value</b><span class="muted">Demonstrates API, database, testing and deployment concepts.</span></div></div>
+<div class="callout"><b>Project-specific note:</b> the repository README confirms the core stack and task CRUD endpoints. Authentication/JWT, roles, Docker and PostgreSQL deployment have also been part of the project's development. Verify the current branch and configuration before describing any feature as live or production-deployed.</div>
+<h3>Typical user story</h3><ol><li>A client sends a request to create a task.</li><li>The API checks the request and applies business rules.</li><li>The application saves the task through the persistence layer.</li><li>The API returns an HTTP status and a response body.</li><li>The client can later read, update or delete that task.</li></ol>
+</section>
+<section class="card" id="stack"><h2>2. Technology stack</h2><div class="table-wrap"><table><thead><tr><th>Technology</th><th>What it does</th><th>How to explain it</th></tr></thead><tbody>
+<tr><td>Java 21</td><td>Programming language and runtime target.</td><td>Used to implement the backend logic.</td></tr>
+<tr><td>Spring Boot</td><td>Bootstraps the application and configures common infrastructure.</td><td>Reduces setup so I can focus on application features.</td></tr>
+<tr><td>Spring MVC</td><td>Maps HTTP requests to controller methods.</td><td>Receives requests and returns HTTP responses.</td></tr>
+<tr><td>Spring Data JPA / Hibernate</td><td>Maps Java entities to relational tables and handles persistence.</td><td>Lets the application work with entity objects instead of writing every SQL statement manually.</td></tr>
+<tr><td>Oracle Database</td><td>Relational database used in the local project setup.</td><td>Stores users and tasks in tables.</td></tr>
+<tr><td>Flyway</td><td>Runs versioned database migration scripts.</td><td>Keeps schema changes ordered and repeatable.</td></tr>
+<tr><td>JUnit 5</td><td>Test framework.</td><td>Organizes and runs automated tests.</td></tr>
+<tr><td>Mockito</td><td>Creates test doubles such as mocked repositories.</td><td>Lets a unit test focus on service logic without needing a real database.</td></tr>
+<tr><td>Postman</td><td>API client for sending requests manually.</td><td>Helps test endpoints and inspect status codes and JSON responses.</td></tr>
+<tr><td>Docker</td><td>Packages an application into a container image.</td><td>Helps run the application in a repeatable environment.</td></tr>
+<tr><td>Git / GitHub</td><td>Version control and remote source hosting.</td><td>Tracks code changes and shares the project.</td></tr>
+</tbody></table></div></section>
+<section class="card" id="architecture"><h2>3. Layered architecture</h2><p>A common Spring Boot structure separates HTTP handling, business rules, and database access. Treat this as the conceptual model; use the actual package and class names from your repository when presenting your implementation.</p>
+<div class="flow"><span>Client / Postman</span><i>→</i><span>Controller</span><i>→</i><span>Service</span><i>→</i><span>Repository</span><i>→</i><span>Database</span></div>
+<h3>Responsibilities</h3><ul><li><b>Controller:</b> accepts HTTP requests, reads path/query/body data, and returns HTTP responses. Avoid putting substantial business rules here.</li><li><b>Service:</b> implements application rules, coordinates operations, and is a natural unit-testing target.</li><li><b>Repository:</b> provides data-access operations, commonly through Spring Data interfaces.</li><li><b>Entity:</b> represents persisted data and its table mapping.</li><li><b>DTO (if used):</b> defines the data accepted from or returned to API clients. DTOs help avoid exposing persistence details directly.</li><li><b>Exception handler (if used):</b> converts exceptions into consistent HTTP error responses.</li></ul>
+<div class="callout"><b>Why separate layers?</b> It improves readability, testability, reuse and change isolation. A controller can change its HTTP mapping without requiring every database detail to be rewritten.</div>
+</section>
+<section class="card" id="rest"><h2>4. REST API and HTTP basics</h2><p>REST-style APIs expose resources through URLs and use HTTP methods to express the requested operation. This project's README lists the following task routes:</p>
+<div class="table-wrap"><table><thead><tr><th>Method</th><th>Endpoint</th><th>Purpose</th><th>Common success status</th></tr></thead><tbody>
+<tr><td><code>POST</code></td><td><code>/tasks</code></td><td>Create a task</td><td><code>201 Created</code> (or <code>200 OK</code> if implemented that way)</td></tr>
+<tr><td><code>GET</code></td><td><code>/tasks</code></td><td>Retrieve tasks</td><td><code>200 OK</code></td></tr>
+<tr><td><code>GET</code></td><td><code>/tasks/{id}</code></td><td>Retrieve one task</td><td><code>200 OK</code>; <code>404</code> if absent</td></tr>
+<tr><td><code>PUT</code></td><td><code>/tasks/{id}</code></td><td>Update a task</td><td><code>200 OK</code> or <code>204 No Content</code></td></tr>
+<tr><td><code>DELETE</code></td><td><code>/tasks/{id}</code></td><td>Delete a task</td><td><code>204 No Content</code> or another documented success response</td></tr>
+</tbody></table></div>
+<p class="muted">These are the endpoint paths from the README. The exact status codes, request fields, response JSON and authentication requirements must be checked in the current controller and security configuration.</p>
+<h3>HTTP status codes worth knowing</h3><ul><li><code>200 OK</code> — request succeeded and a response is returned.</li><li><code>201 Created</code> — a resource was created.</li><li><code>204 No Content</code> — request succeeded with no response body.</li><li><code>400 Bad Request</code> — request data is invalid or malformed.</li><li><code>401 Unauthorized</code> — authentication is missing or invalid.</li><li><code>403 Forbidden</code> — caller is authenticated but lacks permission.</li><li><code>404 Not Found</code> — requested resource does not exist.</li><li><code>500 Internal Server Error</code> — unexpected server-side failure.</li></ul>
+<h3>Example request</h3><pre><code>POST /tasks
+Content-Type: application/json
+
+{
+  "title": "Revise Spring Boot",
+  "description": "Practise controllers and services"
+}</code></pre><p class="muted">Illustrative JSON only. Adjust field names and required properties to match the DTO/entity in the repository.</p>
+</section>
+<section class="card" id="flow"><h2>5. What happens when an API request arrives?</h2><ol><li>The client sends an HTTP request to the application URL.</li><li>If security filters are configured, they check whether the route requires authentication and whether the supplied credentials/token are acceptable.</li><li>Spring MVC finds a matching controller mapping.</li><li>Spring converts JSON into a Java request object when the method expects a body.</li><li>Validation runs if the endpoint uses validation annotations and the appropriate validation trigger.</li><li>The controller calls the service layer.</li><li>The service applies business rules and calls the repository.</li><li>JPA/Hibernate executes database operations inside the configured transaction boundary.</li><li>The result travels back through the service and controller.</li><li>Spring serializes the response object as JSON and sends an HTTP status.</li></ol>
+<div class="callout">When debugging, check one layer at a time: URL and HTTP method → security → controller mapping → request JSON/validation → service logic → repository/database → response serialization.</div>
+</section>
+<section class="card" id="spring"><h2>6. Spring concepts used in a backend project</h2>
+<h3>Dependency Injection (DI)</h3><p>Dependency Injection means a class receives the objects it depends on instead of constructing every dependency itself. Spring's IoC container creates and wires managed objects called beans.</p>
+<pre><code>@Service
+public class TaskService {
+    private final TaskRepository taskRepository;
+
+    public TaskService(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
+    }
+}</code></pre><p>This is a generic constructor-injection example. Use the names and patterns present in your actual project.</p>
+<h3>Important annotations</h3><div class="table-wrap"><table><thead><tr><th>Annotation</th><th>Meaning</th></tr></thead><tbody>
+<tr><td><code>@SpringBootApplication</code></td><td>Common application entry-point annotation; combines configuration, auto-configuration and component scanning.</td></tr>
+<tr><td><code>@RestController</code></td><td>Marks a controller whose return values are typically written to the response body.</td></tr>
+<tr><td><code>@RequestMapping</code></td><td>Defines a base or specific request mapping.</td></tr>
+<tr><td><code>@GetMapping</code>, <code>@PostMapping</code></td><td>Map HTTP GET and POST requests.</td></tr>
+<tr><td><code>@PathVariable</code></td><td>Reads a value from the URL path, such as the task ID.</td></tr>
+<tr><td><code>@RequestBody</code></td><td>Deserializes the request body into a Java object.</td></tr>
+<tr><td><code>@Service</code></td><td>Marks a service component for Spring's component scanning.</td></tr>
+<tr><td><code>@Repository</code></td><td>Marks a persistence component; Spring Data repository interfaces often provide the implementation.</td></tr>
+<tr><td><code>@Entity</code></td><td>Marks a JPA entity.</td></tr>
+<tr><td><code>@Id</code></td><td>Marks the primary-key field.</td></tr>
+<tr><td><code>@ManyToOne</code></td><td>Models many rows/entities associated with one related entity; this project setup has tasks associated with users.</td></tr>
+<tr><td><code>@Transactional</code></td><td>Defines a transaction boundary when applied appropriately.</td></tr>
+<tr><td><code>@Valid</code></td><td>Triggers bean validation for a supported method parameter.</td></tr>
+</tbody></table></div>
+<h3>Why constructor injection?</h3><ul><li>Dependencies are explicit and can be declared <code>final</code>.</li><li>Tests can supply mocks without starting the full Spring context.</li><li>Required dependencies are available when the object is constructed.</li></ul>
+</section>
+<section class="card" id="database"><h2>7. Database, entities and JPA</h2><p>A relational database stores information in tables. Rows represent individual records and columns represent fields. Primary keys uniquely identify rows; foreign keys connect related tables.</p>
+<h3>Entity relationship in this project</h3><p>The project setup includes users and tasks. A task has a many-to-one relationship to a user through a <code>user_id</code> foreign key; the task's user reference has been configured as non-nullable in the current project design.</p>
+<pre><code>USER (one)  ─────────  (many) TASK
+  user id  &lt;──────────  task.user_id</code></pre>
+<p>In Java, <code>@ManyToOne</code> represents the object relationship, while the database foreign key enforces referential integrity. A foreign key prevents a task from referring to a user row that does not exist.</p>
+<h3>JPA versus Hibernate</h3><ul><li><b>JPA</b> is the Java persistence specification: it defines standard APIs and annotations.</li><li><b>Hibernate</b> is a common implementation of JPA.</li><li><b>Spring Data JPA</b> adds repository abstractions to reduce persistence boilerplate.</li></ul>
+<h3>Schema validation</h3><p>With Hibernate schema mode set to <code>validate</code>, Hibernate checks that mapped entities are compatible with the database schema at startup rather than automatically creating or altering the schema. Schema changes should be managed deliberately, for example with Flyway migrations.</p>
+</section>
+<section class="card" id="flyway"><h2>8. Flyway database migrations</h2><p>Flyway records which versioned SQL migration scripts have been applied. This makes schema changes traceable and helps developers apply them in a consistent order across environments.</p>
+<div class="table-wrap"><table><thead><tr><th>Migration</th><th>Purpose in this project setup</th></tr></thead><tbody><tr><td><code>V1</code></td><td>Create the users table.</td></tr><tr><td><code>V2</code></td><td>Create the tasks table.</td></tr><tr><td><code>V3</code></td><td>Add indexes.</td></tr></tbody></table></div>
+<h3>How it works</h3><ol><li>Place a versioned SQL file in the configured Flyway migration location.</li><li>Use a unique, ordered name such as <code>V4__add_task_due_date.sql</code>.</li><li>On startup, Flyway checks its schema-history table.</li><li>Flyway applies migrations that have not yet run and records their status/checksum.</li><li>Hibernate validates entity mappings against the resulting schema if validation is enabled.</li></ol>
+<div class="callout warn"><b>Important:</b> after a migration has been applied to a shared or deployed database, do not casually edit the old migration. Create a new migration for the next schema change. Never paste database passwords or JWT secrets into public source code.</div>
+<h3>Useful checks</h3><pre><code>-- Example only; adapt schema/table names to your database
+SELECT version, description, success
+FROM flyway_schema_history
+ORDER BY installed_rank;</code></pre>
+<p>Oracle column names and identifier casing can require quoting depending on how objects were created. If a query fails with an invalid identifier, inspect the table definition and column names rather than guessing.</p>
+</section>
+<section class="card" id="validation"><h2>9. Validation and exception handling</h2><p>Validation rejects invalid input before it can cause inconsistent application data. Common Bean Validation annotations include:</p><ul><li><code>@NotBlank</code> — a string must contain a non-whitespace character.</li><li><code>@NotNull</code> — a value must not be null.</li><li><code>@Size</code> — a value's size must be within a specified range.</li><li><code>@Positive</code> — a numeric value must be greater than zero.</li></ul>
+<p>These are examples; use only constraints appropriate for your actual request fields.</p>
+<h3>Exception handling</h3><p>When a requested task ID does not exist, the service can signal a not-found condition and the API can return a meaningful <code>404</code>. Invalid request data usually maps to <code>400</code>. A centralized handler such as one using <code>@RestControllerAdvice</code> can keep error response formats consistent, if implemented in the project.</p>
+<h3>Good error response principles</h3><ul><li>Give the client a useful message and correct status code.</li><li>Do not expose stack traces, secrets, SQL credentials or internal implementation details.</li><li>Log diagnostic details on the server side.</li><li>Test both success and failure cases.</li></ul>
+</section>
+<section class="card" id="security"><h2>10. Authentication, JWT and authorization</h2><p>The project has included Spring Security and JWT-based authentication in its development. Verify the current code/configuration before assuming every environment has the same security setup.</p>
+<h3>Authentication versus authorization</h3><ul><li><b>Authentication:</b> who is making the request?</li><li><b>Authorization:</b> is that identity allowed to perform this operation?</li></ul>
+<h3>Typical JWT request flow</h3><ol><li>A client submits login credentials to the authentication endpoint.</li><li>The server verifies the credentials.</li><li>The server issues a signed token with configured claims and expiry.</li><li>The client sends the token in the <code>Authorization: Bearer ...</code> header on protected requests.</li><li>A security filter validates the token and establishes the authenticated principal.</li><li>Authorization rules decide whether that principal can access the endpoint.</li></ol>
+<h3>Project details to remember</h3><ul><li>The JWT secret property used in the project is named <code>app.jwt.secret</code>.</li><li>The remembered default token expiration is <code>86400000</code> milliseconds (24 hours), unless overridden by configuration.</li><li>The user model uses a role field, with role values such as <code>USER</code> and <code>ADMIN</code>.</li><li>Method-level authorization has been configured for some operations; remembered examples include ADMIN-only task creation and USER/ADMIN access to listing tasks.</li><li>Password fields should never be returned in API responses. The project has used <code>@JsonIgnore</code> for the password field; dedicated response DTOs are another option.</li></ul>
+<div class="callout warn">A JWT secret must be long, random and supplied through environment variables or a secret manager in deployed environments. Do not commit real credentials. Do not claim that JWT encrypts the payload: a signed JWT is generally integrity-protected, not secret by default.</div>
+</section>
+<section class="card" id="tests"><h2>11. Unit testing with JUnit 5 and Mockito</h2><p>Tests help detect regressions when the application changes. JUnit 5 provides test structure and assertions; Mockito lets a test replace collaborators with mocks.</p>
+<h3>Typical service unit-test pattern</h3><ol><li>Create the service under test.</li><li>Mock the repository or other external dependency.</li><li>Arrange the mock's expected behavior.</li><li>Call the service method.</li><li>Assert the result or exception.</li><li>Verify important interactions when useful.</li></ol>
+<pre><code>// Generic illustration, not a copy of a project test
+@ExtendWith(MockitoExtension.class)
+class TaskServiceTest {
+    @Mock
+    TaskRepository taskRepository;
+
+    @InjectMocks
+    TaskService taskService;
+
+    @Test
+    void exampleTest() {
+        // Arrange: configure a mock
+        // Act: call the service
+        // Assert: check the expected result
+    }
+}</code></pre>
+<p>The remembered project test run had <b>8 Mockito service tests passing</b> at that point. Re-run tests to confirm the current state before reporting this number in a resume or interview.</p>
+<h3>Useful test cases</h3><ul><li>Create a task with valid data.</li><li>Retrieve all tasks, including the empty-list case.</li><li>Retrieve a task that exists.</li><li>Request an ID that does not exist.</li><li>Update a task successfully and handle a missing task.</li><li>Delete an existing task and handle a missing task.</li><li>Reject invalid input.</li><li>Check authorization for protected endpoints.</li></ul>
+<h3>Run tests</h3><pre><code># Windows PowerShell, from the project root
+.\mvnw.cmd test
+
+# If the project does not include the Maven Wrapper
+mvn test</code></pre>
+</section>
+<section class="card" id="docker"><h2>12. Docker and deployment basics</h2><p>Docker packages an application and its runtime into an image. A container is a running instance of that image. Docker can make application startup more repeatable, but it does not automatically provide a database or make the application production-ready.</p>
+<h3>Terms</h3><ul><li><b>Dockerfile:</b> instructions to build an image.</li><li><b>Image:</b> packaged filesystem and runtime layers.</li><li><b>Container:</b> a running instance of an image.</li><li><b>Port mapping:</b> connects a host port to a container port.</li><li><b>Environment variable:</b> passes configuration without hardcoding it in the image.</li><li><b>Docker Compose:</b> defines and runs multiple related services.</li></ul>
+<p>The project setup has used an Eclipse Temurin Java 21 JRE base image. A previous local Compose setup mapped host port <code>8084</code> to application port <code>8083</code> and used <code>host.docker.internal</code> to reach an Oracle database running on the host. These are environment-specific settings, not universal production defaults.</p>
+<h3>Deployment checklist</h3><ul><li>Build and test the application.</li><li>Supply the database URL, username and password via environment variables/secrets.</li><li>Supply a secure JWT secret through secret configuration.</li><li>Confirm the app listens on the port expected by the hosting platform.</li><li>Check database network access and run migrations safely.</li><li>Read deployment logs and test a health endpoint or a known API route.</li><li>Never assume a local Oracle connection string will work on a remote host.</li></ul>
+</section>
+<section class="card" id="config"><h2>13. Configuration and common troubleshooting</h2><p>Spring Boot configuration commonly lives in <code>src/main/resources/application.properties</code> or <code>application.yml</code>. Keep environment-specific values outside source control where possible.</p>
+<h3>Typical configuration categories</h3><ul><li>Server port</li><li>Datasource URL and credentials</li><li>JPA/Hibernate behavior</li><li>Flyway migration settings</li><li>JWT secret and expiry</li><li>Logging levels</li></ul>
+<h3>Common problems</h3><div class="table-wrap"><table><thead><tr><th>Symptom</th><th>What to check</th></tr></thead><tbody>
+<tr><td>Application cannot connect to database</td><td>Database service status, hostname, port, service name, credentials, network and JDBC URL.</td></tr>
+<tr><td>Flyway migration fails</td><td>SQL syntax, migration order, schema permissions and whether a prior migration partially changed the schema.</td></tr>
+<tr><td>Hibernate validation fails</td><td>Entity/table/column names, data types, nullability, foreign keys and applied migrations.</td></tr>
+<tr><td><code>401</code> response</td><td>Whether a token is required, token format, expiry, signing secret and authentication filter configuration.</td></tr>
+<tr><td><code>403</code> response</td><td>Authenticated role/authorities and endpoint/method authorization rules.</td></tr>
+<tr><td><code>404</code> for an endpoint</td><td>Request path, HTTP method, controller mapping and any base path.</td></tr>
+<tr><td>Port already in use</td><td>Find the process using the port or configure a different application port.</td></tr>
+<tr><td>Works locally but fails in Docker</td><td>Container port, host port mapping, environment variables, DNS/network and database reachability.</td></tr>
+</tbody></table></div>
+<h3>Safe workflow for a schema change</h3><ol><li>Update or add the Flyway migration.</li><li>Update the corresponding entity mapping.</li><li>Run against a development database first.</li><li>Run automated tests and start the app with schema validation enabled.</li><li>Inspect the migration history and verify the affected endpoint.</li><li>Commit the change with a clear message.</li></ol>
+</section>
+<section class="card" id="interview"><h2>14. Interview questions and sample answers</h2>
+<div class="qa"><b>1. Explain your project in brief.</b><p>“I developed a Task Manager REST API using Java and Spring Boot. It exposes endpoints to create, retrieve, update and delete tasks. The project uses Spring Data JPA for persistence, Oracle with Flyway for database schema changes, and JUnit 5 with Mockito for testing. I also worked on validation, exception handling and security/deployment features as part of the project.”</p><p class="muted">Only mention security and deployment features that you can demonstrate in the current code.</p></div>
+<div class="qa"><b>2. Why did you use Spring Boot?</b><p>Spring Boot provides auto-configuration and convenient application setup, reducing boilerplate compared with configuring every component manually.</p></div>
+<div class="qa"><b>3. What is a REST API?</b><p>It is an HTTP-based interface that exposes resources through endpoints and uses methods such as GET, POST, PUT and DELETE to communicate operations.</p></div>
+<div class="qa"><b>4. What is dependency injection?</b><p>It is a technique in which an object receives its dependencies from an external container or caller rather than constructing them itself. Spring's container manages beans and their dependencies.</p></div>
+<div class="qa"><b>5. Why use service and repository layers?</b><p>The service layer holds application/business rules, while the repository layer handles persistence. Separating responsibilities improves maintainability and testing.</p></div>
+<div class="qa"><b>6. What is JPA? What is Hibernate?</b><p>JPA defines the standard persistence API and mapping model; Hibernate is a widely used implementation of that specification.</p></div>
+<div class="qa"><b>7. Why use Flyway?</b><p>Flyway versions database changes as ordered migrations and records which scripts have run, making schema evolution more repeatable across environments.</p></div>
+<div class="qa"><b>8. What does schema validation do?</b><p>Hibernate's validation mode checks entity mappings against the existing database schema at startup; it does not replace a deliberate migration strategy.</p></div>
+<div class="qa"><b>9. What is the difference between PUT and POST?</b><p>POST commonly creates a subordinate resource or submits an operation. PUT commonly replaces or updates the resource identified by the target URL and is designed to be idempotent.</p></div>
+<div class="qa"><b>10. What is the difference between 401 and 403?</b><p>401 means valid authentication has not been established. 403 means the request is understood but the authenticated caller is not allowed to perform it.</p></div>
+<div class="qa"><b>11. What is JWT?</b><p>JWT is a compact token format that can carry claims. In a typical signed-token flow, the server verifies the signature and expiry before trusting the claims.</p></div>
+<div class="qa"><b>12. Authentication versus authorization?</b><p>Authentication verifies identity; authorization checks permissions for an operation or resource.</p></div>
+<div class="qa"><b>13. Why validate request data?</b><p>Validation rejects malformed or out-of-range input early, protects business rules and gives clients clear feedback.</p></div>
+<div class="qa"><b>14. How do you handle a task ID that does not exist?</b><p>The service should identify the missing resource and the API should return a meaningful not-found response, typically HTTP 404, using the project's chosen exception-handling approach.</p></div>
+<div class="qa"><b>15. What is unit testing?</b><p>Unit testing checks a small unit of code in isolation. For a service, I can mock the repository and test success and failure paths without requiring a real database.</p></div>
+<div class="qa"><b>16. Why Mockito?</b><p>Mockito creates mocks and stubs so tests can control dependency behavior and verify interactions where necessary.</p></div>
+<div class="qa"><b>17. Why use Docker?</b><p>Docker packages the app and runtime into a portable image and helps run it consistently across environments, with external configuration supplied separately.</p></div>
+<div class="qa"><b>18. How would you improve this project?</b><p>Depending on what is already implemented, I would consider API documentation, stronger integration tests, pagination and filtering, structured logs, health checks, secure secret management, CI automation, and a deployed demo. I would first inspect existing features to avoid duplicating work.</p></div>
+<h3>30-second project pitch</h3><p>“My project is a Task Manager REST API built with Java and Spring Boot. It provides CRUD endpoints for tasks and uses Spring Data JPA to persist data in a relational database. I used Flyway to manage schema changes and JUnit 5 with Mockito to test service logic. Building it helped me understand REST API design, layered architecture, database integration, error handling and automated testing.”</p>
+</section>
+<section class="card" id="checklist"><h2>15. Revision checklist</h2><p>Use this before an interview or project demonstration.</p><ul class="checklist">
+<li>☐ Explain the purpose of the API and demonstrate the CRUD endpoints.</li><li>☐ Explain the role of controller, service, repository and entity.</li><li>☐ Describe one request from HTTP entry to database and back.</li><li>☐ Explain Java 21, Spring Boot, Spring Data JPA and Hibernate.</li><li>☐ Show the database tables and explain the task-to-user relationship.</li><li>☐ Explain Flyway V1, V2 and V3 and how to add a new migration.</li><li>☐ Explain validation and the error response for a missing task.</li><li>☐ If using JWT, demonstrate login, bearer token and role-based access.</li><li>☐ Run the test suite and explain at least one Mockito test.</li><li>☐ Explain the Dockerfile, port mapping and external configuration.</li><li>☐ Confirm what is deployed, where it is deployed, and what is still local-only.</li><li>☐ Never expose database passwords, access tokens or JWT secrets during a demo.</li></ul>
+<div class="callout"><b>Best interview habit:</b> be precise about your own contribution. If something is planned but not implemented, say so honestly and explain how you would implement it.</div>
+<p><a class="toplink" href="#top">↑ Back to top</a></p>
+</section>
+</main>
+</div>
+<footer class="footer">Task Manager API — learning and interview notes · Prepared for the project repository<br>Keep these notes synchronized with the actual code as the project evolves.</footer>
+</body>
+</html>
