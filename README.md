@@ -1,54 +1,55 @@
-# Task Manager REST API
+# Task Manager API
 
-## Overview
+A RESTful Task Management API built using Java and Spring Boot, with JWT authentication, role-based authorization, PostgreSQL persistence, and Docker support.
 
-A Spring Boot REST API for managing tasks with CRUD operations.
+## Live Demo
 
-## Technologies Used
+- **Swagger API Documentation:** https://task-manager-api-4b95.onrender.com/swagger-ui/index.html
+- **GitHub Repository:** https://github.com/samueljoep-byte/task-manager-api
+
+## Technology Stack
 
 - Java 21
 - Spring Boot
-- Spring Data JPA
-- Oracle Database
-- Flyway
-- JUnit 5
-- Mockito
-- Postman
-- Git & GitHub
+- Spring Security
+- Spring Data JPA / Hibernate
+- PostgreSQL
+- Flyway Database Migrations
+- JWT Authentication
+- Maven
+- Docker
+- JUnit 5 and Mockito
 
 ## Features
 
-- Create Task
-- Get All Tasks
-- Get Task By ID
-- Update Task
-- Delete Task
-- Validation
-- Exception Handling
-- Unit Testing
+- REST API for task management
+- User registration and login
+- JWT-based authentication
+- Role-based access control
+- Task status management
+- User-task relationship management
+- Database schema migrations using Flyway
+- Automated service-layer tests
+- Dockerized deployment
 
-## API Endpoints
+## API Documentation
 
-### Create Task
+Open the Swagger UI link above to explore available endpoints and send API requests.
 
-POST /tasks
+## Running Locally
 
-### Get All Tasks
+1. Install Java 21 and Maven.
+2. Configure the required database connection and JWT secret.
+3. Set the environment variables `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, and `JWT_SECRET`.
+4. Run the application using Maven or Docker.
 
-GET /tasks
+## Purpose
 
-### Get Task By ID
-
-GET /tasks/{id}
-
-### Update Task
-
-PUT /tasks/{id}
-
-### Delete Task
-
-DELETE /tasks/{id}
+This project demonstrates practical skills in Java backend development, REST API design, database integration, authentication, authorization, testing, and deployment.
 
 ## Author
 
-P Samuel Joe
+P. Samuel Joe
+
+- GitHub: https://github.com/samueljoep-byte
+- LinkedIn: https://www.linkedin.com/in/samuel-joe-b6046516b
